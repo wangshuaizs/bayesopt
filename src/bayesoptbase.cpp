@@ -163,6 +163,60 @@ namespace bayesopt
   }
   
 
+  void BayesOptBase::registerPoint(const vectord &xNext, double yNext)
+  {
+    // If we are stuck in the same point for several iterations, log stuck times!
+    if (mParameters.force_jump)
+      {
+        if (std::pow(mYPrev - yNext,2) < mParameters.noise)
+          {
+            mCounterStuck++;
+            FILE_LOG(logDEBUG) << "Stuck for "<< mCounterStuck << " steps";
+          }
+        else
+          {
+            mCounterStuck = 0;
+          }
+        mYPrev = yNext;
+      }
+
+    mModel->addSample(xNext,yNext);
+
+    // Update surrogate model
+    bool retrain = ((mParameters.n_iter_relearn > 0) && 
+		    ((mCurrentIter + 1) % mParameters.n_iter_relearn == 0));
+
+    if (retrain)  // Full update
+      {
+        mModel->updateHyperParameters();
+        mModel->fitSurrogateModel();
+      }
+    else          // Incremental update
+      {
+        mModel->updateSurrogateModel();
+      } 
+
+    plotStepData(mCurrentIter,xNext,yNext);
+    mModel->updateCriteria(xNext);
+    mCurrentIter++;
+    
+    // Save state if required
+    if(mParameters.load_save_flag == 2 || mParameters.load_save_flag == 3)
+      {
+        BOptState state;
+        saveOptimization(state);
+        state.saveToFile(mParameters.save_filename);
+      }
+  }
+
+
+  vectord BayesOptBase::suggest()
+  {
+    // Find what is the next point.
+    return nextPoint(); 
+  }
+
+
   void BayesOptBase::initializeOptimization()
   {
     // Posterior surrogate model

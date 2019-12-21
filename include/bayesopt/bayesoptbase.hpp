@@ -131,6 +131,12 @@ namespace bayesopt {
      */  
     void stepOptimization();
 
+    /** Register a test point.  */
+    void registerPoint(const vectord &xNext, double yNext);
+
+    /** Suggest the next point to probe.  */
+    vectord suggest();
+
     /** Initialize the optimization process.  */
     void initializeOptimization();
     
