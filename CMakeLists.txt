@@ -49,7 +49,7 @@ option(BAYESOPT_BUILD_TESTS "Build tests?" OFF)
 option(BAYESOPT_PYTHON_INTERFACE "Build Python interface?" OFF)
 option(BAYESOPT_MATLAB_COMPATIBLE "Build library compatible with Matlab?" ON)
 option(BAYESOPT_BUILD_SOBOL "Build support for Sobol sequences?" ON)
-option(BAYESOPT_BUILD_SHARED "Build BayesOpt as a shared library?" OFF)
+option(BAYESOPT_BUILD_SHARED "Build BayesOpt as a shared library?" ON)
 
 find_package( Boost REQUIRED )
 if(Boost_FOUND)
